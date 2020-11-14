@@ -1,6 +1,6 @@
 
 #importamos de la carpeta productos y del archivo models la variable products
-from db import db, ma
+from app.db import db, ma
 from conf.config import DevelopmentConfig
 from app.products.views import products
 
