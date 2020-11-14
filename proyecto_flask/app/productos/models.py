@@ -22,7 +22,7 @@ class Product(db.Model):
 class ProductSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Product
-        fields = ["id", "name", "price"]
+        #fields = ["id", "name", "price"]
 
 
 class Category(db.Model):
@@ -48,6 +48,11 @@ class Stock(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now())
 
+class StockSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Stock
+
+
 
 def get_all_categories():
     categories = Category.query.all()
@@ -66,6 +71,16 @@ def create_new_category(name):
     return None
 
 
+def create_new_product(name,price,refundable):
+    new_product = Product(name=name,price=price,refundable=refundable)
+    db.session.add(new_product)
+
+    if db.session.commit():
+        return new_product
+
+    return None
+
+
 def get_all_products():
     products_qs = Product.query.all()
     product_schema = ProductSchema()
@@ -79,4 +94,34 @@ def get_product_by_id(id):
     product_qs = Product.query.filter_by(id=id).first()
     product_schema = ProductSchema()
     p = product_schema.dump(product_qs)
+
     return p
+
+def get_all_stock():
+    get_stock = Stock.query.all()
+    stock_schema = StockSchema()
+    get_stock = [stock_schema.dump(stock) for stock in get_stock]
+    return get_stock
+
+def create_new_stock(product_id, quantity):
+    
+    product_schema = ProductSchema()
+    p = product_schema.dump(Product.query.filter_by(id=product_id).first())
+    if p:
+        new_stock = Stock(product_id=product_id,quantity=quantity)
+        db.session.add(new_stock)
+
+        if db.session.commit():
+            return new_stock
+
+        return None
+
+    return "non-existent product"
+
+def prueba(id):
+    product_schema = ProductSchema()
+    p = product_schema.dump(Product.query.filter_by(id=id).first())
+    if p:
+        return p
+    else:
+        return "No hay nada"

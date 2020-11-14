@@ -1,8 +1,8 @@
 
-#importamos de la carpeta productos y del archivo models la variable products
 from app.db import db, ma
 from conf.config import DevelopmentConfig
-from app.products.views import products
+from app.productos.views import products
+from flask import Flask
 
 ACTIVE_ENDPOINTS = [('/products', products)]
 

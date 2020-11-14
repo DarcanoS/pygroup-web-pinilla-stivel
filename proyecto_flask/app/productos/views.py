@@ -7,8 +7,9 @@ Las plantillas las vamos a guardar en ficheros en el directorio templates (dentr
 from http import HTTPStatus
 from flask import Blueprint, Response, request
 
-from app.products.models import get_all_categories, create_new_category, \
-    get_all_products, get_product_by_id
+from app.productos.models import get_all_categories, prueba, create_new_stock, get_all_stock, create_new_category, create_new_product, get_all_products, get_product_by_id
+
+
 
 products = Blueprint("products", __name__, url_prefix='/products')
 
@@ -80,14 +81,38 @@ def create_category():
     return RESPONSE_BODY, status_code
 
 
+
+@products.route('/add-product', methods=['POST'])
+def create_product():
+    
+
+    RESPONSE_BODY["message"] = "Method not allowed"
+    status_code = HTTPStatus.METHOD_NOT_ALLOWED
+    if request.method == "POST":
+        data = request.json
+        add_product = create_new_product(data["name"],data["price"],data["refundable"])
+        RESPONSE_BODY["message"] = "OK. Product created!"
+        RESPONSE_BODY["data"] = add_product
+        status_code = HTTPStatus.CREATED
+
+    return RESPONSE_BODY, status_code
+
+
+
 @products.route('/')
 def get_products():
     products_obj = get_all_products()
+    status_code = HTTPStatus.OK
 
-    RESPONSE_BODY["data"] = products_obj
-    RESPONSE_BODY["message"] = "Products list"
+    if products_obj:
+        RESPONSE_BODY["message"] = "OK. Products List"
+        RESPONSE_BODY["data"] = products_obj
+    else:
+        RESPONSE_BODY["message"] = "OK. No products found"
+        RESPONSE_BODY["data"] = products_obj
+        status_code = HTTPStatus.NOT_FOUND
 
-    return RESPONSE_BODY, 200
+    return RESPONSE_BODY, status_code
 
 
 @products.route('/product/<int:id>')
@@ -102,6 +127,40 @@ def get_product(id):
 def get_product_stock(product_id):
     pass
 
+@products.route('/stock')
+def get_stock():
+    """
+        Verificar que si get_all_categories es [] 400, message = "No hay nada"
+    :return:
+    """
+    get_stock = get_all_stock()
+    status_code = HTTPStatus.OK
+
+    if get_stock:
+        RESPONSE_BODY["message"] = "OK. Categories List"
+        RESPONSE_BODY["data"] = get_stock
+    else:
+        RESPONSE_BODY["message"] = "OK. No Stock found"
+        RESPONSE_BODY["data"] = get_stock
+        status_code = HTTPStatus.NOT_FOUND
+
+    return RESPONSE_BODY, status_code
+
+@products.route('/add-stock', methods=['POST'])
+def create_stock():
+    
+
+    RESPONSE_BODY["message"] = "Method not allowed"
+    status_code = HTTPStatus.METHOD_NOT_ALLOWED
+    if request.method == "POST":
+        data = request.json
+        add_stock = create_new_stock(data["product_id"],data["quantity"])
+        RESPONSE_BODY["message"] = "OK. Stock created!"
+        RESPONSE_BODY["data"] = add_stock
+        status_code = HTTPStatus.CREATED
+
+    return RESPONSE_BODY, status_code
+
 
 @products.route('/need-restock')
 def get_products_that_need_restock():
@@ -111,3 +170,8 @@ def get_products_that_need_restock():
 @products.route('/register-product-stock/<int:id>', methods=['PUT', 'POST'])
 def register_product_refund_in_stock():
     pass
+
+@products.route('/prueba/<numero>', methods=['GET'])
+def prueba_mia(numero):
+     RESPONSE_BODY["data"]= prueba(numero)
+     return RESPONSE_BODY
