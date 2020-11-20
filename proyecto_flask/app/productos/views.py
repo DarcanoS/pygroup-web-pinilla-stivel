@@ -155,7 +155,7 @@ def create_stock():
     if request.method == "POST":
         data = request.json
         add_stock = create_new_stock(data["product_id"],data["quantity"])
-        RESPONSE_BODY["message"] = "OK. Stock created!"
+        #RESPONSE_BODY["message"] = "OK. Stock created!"
         RESPONSE_BODY["data"] = add_stock
         status_code = HTTPStatus.CREATED
 

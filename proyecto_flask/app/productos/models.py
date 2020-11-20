@@ -108,6 +108,7 @@ def create_new_stock(product_id, quantity):
     product_schema = ProductSchema()
     p = product_schema.dump(Product.query.filter_by(id=product_id).first())
     if p:
+        RESPONSE_BODY["message"] = "OK. Stock created!"
         new_stock = Stock(product_id=product_id,quantity=quantity)
         db.session.add(new_stock)
 
@@ -115,8 +116,9 @@ def create_new_stock(product_id, quantity):
             return new_stock
 
         return None
+    RESPONSE_BODY["message"] = "OK. Not Stock created!"
 
-    return "non-existent product"
+    return None
 
 def prueba(id):
     product_schema = ProductSchema()
