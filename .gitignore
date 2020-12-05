@@ -88,4 +88,4 @@ yarn-error.log
 .pnp.*
 env/
 .vscode/
-migrations/__pycache__
+.\migrations\__pycache__\
