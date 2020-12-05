@@ -3,12 +3,16 @@ from app.db import db, ma
 from conf.config import DevelopmentConfig
 from app.productos.views import products
 from flask import Flask
+from flask_migrate import Migrate
+
 
 ACTIVE_ENDPOINTS = [('/products', products)]
 
 
 def create_app(config=DevelopmentConfig):
     app = Flask(__name__)
+    migrate = Migrate(app, db)
+
 
     app.config.from_object(config)
 

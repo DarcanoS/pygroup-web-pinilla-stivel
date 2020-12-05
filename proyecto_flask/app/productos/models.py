@@ -10,6 +10,7 @@ class Product(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    image = db.Column(db.String(500), default="https://bit.ly/3loPYXP")
     price = db.Column(db.Integer, nullable=False)
     weight = db.Column(db.Integer, default=1)
     description = db.Column(db.String(500), nullable=True)
