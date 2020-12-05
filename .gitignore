@@ -88,4 +88,8 @@ yarn-error.log
 .pnp.*
 env/
 .vscode/
-.\migrations\__pycache__\
+./app/migrations/__pycache__/
+./app/conf/__pycache__
+./app/__pycache__/*
+./app/productos/__pycache__/*
+proyecto_flask/app/__pycache__/__init__.cpython-38.pyc

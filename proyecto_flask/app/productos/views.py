@@ -5,7 +5,9 @@ Las plantillas las vamos a guardar en ficheros en el directorio templates (dentr
 """
 
 from http import HTTPStatus
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, render_template, redirect, url_for
+
+from app.productos.forms import  CreateCategoryForm
 
 from app.productos.models import get_all_categories, prueba, create_new_stock, get_all_stock, create_new_category, create_new_product, get_all_products, get_product_by_id
 
@@ -175,3 +177,17 @@ def register_product_refund_in_stock():
 def prueba_mia(numero):
      RESPONSE_BODY["data"]= prueba(numero)
      return RESPONSE_BODY
+
+@products.route('/success')
+def success():
+    return render_template('category_success.html')
+
+@products.route('/create-category-form', methods=['GET', 'POST'])
+def create_category_form():
+    form_category = CreateCategoryForm()
+    if request.method == 'POST' and form_category.validate():
+        create_new_category(name=form_category.name.data)
+        return redirect(url_for('products.success'))
+
+
+    return render_template('create_category_form.html', form=form_category)
