@@ -140,6 +140,10 @@ def get_stock():
 
 @products.route('/add-stock', methods=['PUT','POST'])
 def create_stock():
+    """
+    # TODO Complete this view to update stock for product when a register for
+    # this products exists. If not create the new register in DB
+    """
     RESPONSE_BODY["message"] = "Method not allowed"
     status_code = HTTPStatus.METHOD_NOT_ALLOWED
     if request.method == "POST":
@@ -181,9 +185,4 @@ def create_category_form():
 
 
     return render_template('create_category_form.html', form=form_category)
-
-@products.route('/delete')
-def delete_stock():
-    RESPONSE_BODY["data"] = delete_DB()
-    return RESPONSE_BODY, 200
 

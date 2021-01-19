@@ -130,19 +130,5 @@ def update_stock(id,product_id, quantity):
         return stock_in_DB
     return None
 
-def prueba(id):
-    product_schema = ProductSchema()
-    p = product_schema.dump(Product.query.filter_by(id=id).first())
-    if p:
-        return p
-    else:
-        return "Producto no existe"
-    
-def delete_DB():
-    # stock = Stock.query.filter(Stock.id > 1)
-    # db.session.delete(stock)
-    # db.session.commit()
-    Stock.query.filter(Stock.id > 1).delete()
-    db.session.commit()
-    return "YES"
+
 
