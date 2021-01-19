@@ -105,32 +105,30 @@ def get_all_stock():
     return get_stock
 
 def create_new_stock(product_id, quantity):
-    new_stock = Stock(product_id=product_id,quantity=quantity)
-    db.session.add(new_stock)
-
-    if db.session.commit():
-        return new_stock
-
+    product_qs = Product.query.filter_by(id=product_id).first()
+    product_schema = ProductSchema()
+    p = product_schema.dump(product_qs)
+    if p:
+        new_stock = Stock(product_id=product_id,quantity=quantity)
+        db.session.add(new_stock)
+        db.session.commit()
+        
+        return StockSchema().dump(new_stock)
+    
     return None
 
 
-def update_stock(id, product_id, quantity):
+def update_stock(id,product_id, quantity):
     stock_schema = StockSchema()
     stock_in_DB = stock_schema.dump(Stock.query.filter_by(id=id).first())
     if stock_in_DB:
-        product_schema = ProductSchema()
-        p = product_schema.dump(Product.query.filter_by(id=product_id).first())
-        if p:
-            update_stock = Stock(id=id,product_id=product_id,quantity=quantity)
-            db.session.update(update_stock)
-
-            if db.session.commit():
-                return update_stock
-
-            return None
-
-        return "non-existent product"
-    return "Stock Not Found"
+        db.session.query(Stock).filter_by(id=id).update({"quantity":quantity})
+        update = db.session.commit()
+        
+        stock_in_DB = stock_schema.dump(Stock.query.filter_by(id=id).first())
+        
+        return stock_in_DB
+    return None
 
 def prueba(id):
     product_schema = ProductSchema()
@@ -139,3 +137,12 @@ def prueba(id):
         return p
     else:
         return "Producto no existe"
+    
+def delete_DB():
+    # stock = Stock.query.filter(Stock.id > 1)
+    # db.session.delete(stock)
+    # db.session.commit()
+    Stock.query.filter(Stock.id > 1).delete()
+    db.session.commit()
+    return "YES"
+

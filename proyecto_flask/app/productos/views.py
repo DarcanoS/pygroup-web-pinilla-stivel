@@ -7,7 +7,7 @@ from app.productos.forms import  CreateCategoryForm, Create_Stock_Form
 
 from app.productos.models import get_all_categories, prueba, create_new_stock, \
     get_all_stock, create_new_category, create_new_product, get_all_products, \
-        get_product_by_id, update_stock
+        get_product_by_id, update_stock, delete_DB
 
 
 
@@ -101,7 +101,9 @@ def get_products():
 
 @products.route('/<int:numero>', methods=['GET'])
 def get_product(numero):
-    """"""
+    """
+    retorna un producto por su id
+    """
     product = get_product_by_id(numero)
 
     if product:
@@ -136,31 +138,32 @@ def get_stock():
 
     return RESPONSE_BODY, status_code
 
-
-@products.route('/add_stock', methods={"GET","POST"})
-def new_stock():
-    form_stock = Create_Stock_Form()
-    if request.method == 'POST' and form_stock.validate():
-        create_new_stock(product_id=form_stock.product_id.data, quantity=form_stock.quantity.data)
-        return redirect(url_for('products.success'))
-    
-    return render_template('create_stock_form.html', form=form_stock)
-
-
-
-
-@products.route('/add-stock', methods=['POST'])
+@products.route('/add-stock', methods=['PUT','POST'])
 def create_stock():
-    
-
     RESPONSE_BODY["message"] = "Method not allowed"
     status_code = HTTPStatus.METHOD_NOT_ALLOWED
     if request.method == "POST":
         data = request.json
         add_stock = create_new_stock(data["product_id"],data["quantity"])
-        RESPONSE_BODY["message"] = "OK. Stock created!"
-        RESPONSE_BODY["data"] = add_stock
-        status_code = HTTPStatus.CREATED
+        if add_stock:
+            RESPONSE_BODY["message"] = "OK. Stock created!"
+            RESPONSE_BODY["data"] = add_stock
+            status_code = HTTPStatus.CREATED
+        else:
+            RESPONSE_BODY["message"] = "Stock Not Created"
+            RESPONSE_BODY["data"] = add_stock
+            status_code = HTTPStatus.BAD_REQUEST
+    elif  request.method =="PUT":
+        data = request.json
+        add_stock = update_stock(data["id"],data["product_id"],data["quantity"])
+        if add_stock:
+            RESPONSE_BODY["message"] = "OK. Stock update!"
+            RESPONSE_BODY["data"] = add_stock
+            status_code = HTTPStatus.CREATED
+        else:
+            RESPONSE_BODY["message"] = "Stock Not Update"
+            RESPONSE_BODY["data"] = add_stock
+            status_code = HTTPStatus.NOT_FOUND
 
     return RESPONSE_BODY, status_code
 
@@ -178,3 +181,9 @@ def create_category_form():
 
 
     return render_template('create_category_form.html', form=form_category)
+
+@products.route('/delete')
+def delete_stock():
+    RESPONSE_BODY["data"] = delete_DB()
+    return RESPONSE_BODY, 200
+
