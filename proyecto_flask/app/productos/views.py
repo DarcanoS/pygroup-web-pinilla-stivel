@@ -1,15 +1,13 @@
-"""
-render_template de Flask:
-Flask utiliza por defecto jinja2 para generar documentos HTML, para generar una plantilla utilizamos la función render_template que recibe como parámetro el fichero donde guardamos la plantilla y las variables que se pasan a esta.
-Las plantillas las vamos a guardar en ficheros en el directorio templates (dentro del directorio aplicacion).
-"""
+import sys
 
 from http import HTTPStatus
 from flask import Blueprint, Response, request, render_template, redirect, url_for
 
-from app.productos.forms import  CreateCategoryForm
+from app.productos.forms import  CreateCategoryForm, Create_Stock_Form
 
-from app.productos.models import get_all_categories, prueba, create_new_stock, get_all_stock, create_new_category, create_new_product, get_all_products, get_product_by_id
+from app.productos.models import get_all_categories, prueba, create_new_stock, \
+    get_all_stock, create_new_category, create_new_product, get_all_products, \
+        get_product_by_id, update_stock
 
 
 
@@ -26,38 +24,18 @@ RESPONSE_BODY = {
 }
 
 
-@products.route('/dummy-product', methods=['GET', 'POST'])
-def dummy_product():
-    """ This method test the request types. If is GET Type it will
-    render the text Products in h1 label with code 500.
-    If is POST Type it will return Empty shelve! with status code 403
-    """
-    if request.method == 'POST':
-        return EMPTY_SHELVE_TEXT, HTTPStatus.FORBIDDEN
-
-    return PRODUCTS_TITLE, HTTPStatus.INTERNAL_SERVER_ERROR
-
-
-@products.route('/dummy-product-2')
-def dummy_product_two():
-    """ This method shows how Response object could be used to make API
-    methods.
-    """
-    return Response(DUMMY_TEXT, status=HTTPStatus.OK)
-
-
-@products.route('/categories')
+@products.route('/categories',methods=['GET'])
 def get_categories():
     """
-        Verificar que si get_all_categories es [] 400, message = "No hay nada"
+    Retorna todas las categorias
     :return:
     """
-    categories = get_all_categories()
-    status_code = HTTPStatus.OK
+    categories = get_all_categories()    
 
     if categories:
         RESPONSE_BODY["message"] = "OK. Categories List"
         RESPONSE_BODY["data"] = categories
+        status_code = HTTPStatus.OK
     else:
         RESPONSE_BODY["message"] = "OK. No categories found"
         RESPONSE_BODY["data"] = categories
@@ -101,14 +79,19 @@ def create_product():
 
 
 
-@products.route('/')
+@products.route('/', methods=['GET'])
 def get_products():
+    """
+    retorna todos los productos
+    :return:
+    """
     products_obj = get_all_products()
     status_code = HTTPStatus.OK
 
     if products_obj:
         RESPONSE_BODY["message"] = "OK. Products List"
         RESPONSE_BODY["data"] = products_obj
+        status_code = HTTPStatus.OK
     else:
         RESPONSE_BODY["message"] = "OK. No products found"
         RESPONSE_BODY["data"] = products_obj
@@ -116,23 +99,28 @@ def get_products():
 
     return RESPONSE_BODY, status_code
 
+@products.route('/<int:numero>', methods=['GET'])
+def get_product(numero):
+    """"""
+    product = get_product_by_id(numero)
 
-@products.route('/product/<int:id>')
-def get_product(id):
-    product = get_product_by_id(id)
+    if product:
+        RESPONSE_BODY["data"] = product
+        status_code = HTTPStatus.OK
+    else:
+        RESPONSE_BODY["data"] = "Product Not Found"
+        status_code = HTTPStatus.NOT_FOUND
 
-    RESPONSE_BODY["data"] = product
-    return RESPONSE_BODY, 200
-
+    return RESPONSE_BODY, status_code
 
 @products.route('/product-stock/<int:id>')
 def get_product_stock(product_id):
     pass
 
-@products.route('/stock')
+@products.route('/stock', methods=['GET'])
 def get_stock():
     """
-        Verificar que si get_all_categories es [] 400, message = "No hay nada"
+    retorna todo el Stock
     :return:
     """
     get_stock = get_all_stock()
@@ -147,6 +135,19 @@ def get_stock():
         status_code = HTTPStatus.NOT_FOUND
 
     return RESPONSE_BODY, status_code
+
+
+@products.route('/add_stock', methods={"GET","POST"})
+def new_stock():
+    form_stock = Create_Stock_Form()
+    if request.method == 'POST' and form_stock.validate():
+        create_new_stock(product_id=form_stock.product_id.data, quantity=form_stock.quantity.data)
+        return redirect(url_for('products.success'))
+    
+    return render_template('create_stock_form.html', form=form_stock)
+
+
+
 
 @products.route('/add-stock', methods=['POST'])
 def create_stock():
@@ -163,20 +164,6 @@ def create_stock():
 
     return RESPONSE_BODY, status_code
 
-
-@products.route('/need-restock')
-def get_products_that_need_restock():
-    pass
-
-
-@products.route('/register-product-stock/<int:id>', methods=['PUT', 'POST'])
-def register_product_refund_in_stock():
-    pass
-
-@products.route('/prueba/<numero>', methods=['GET'])
-def prueba_mia(numero):
-     RESPONSE_BODY["data"]= prueba(numero)
-     return RESPONSE_BODY
 
 @products.route('/success')
 def success():

@@ -105,19 +105,32 @@ def get_all_stock():
     return get_stock
 
 def create_new_stock(product_id, quantity):
-    
-    product_schema = ProductSchema()
-    p = product_schema.dump(Product.query.filter_by(id=product_id).first())
-    if p:
-        new_stock = Stock(product_id=product_id,quantity=quantity)
-        db.session.add(new_stock)
+    new_stock = Stock(product_id=product_id,quantity=quantity)
+    db.session.add(new_stock)
 
-        if db.session.commit():
-            return new_stock
+    if db.session.commit():
+        return new_stock
 
-        return None
+    return None
 
-    return "non-existent product"
+
+def update_stock(id, product_id, quantity):
+    stock_schema = StockSchema()
+    stock_in_DB = stock_schema.dump(Stock.query.filter_by(id=id).first())
+    if stock_in_DB:
+        product_schema = ProductSchema()
+        p = product_schema.dump(Product.query.filter_by(id=product_id).first())
+        if p:
+            update_stock = Stock(id=id,product_id=product_id,quantity=quantity)
+            db.session.update(update_stock)
+
+            if db.session.commit():
+                return update_stock
+
+            return None
+
+        return "non-existent product"
+    return "Stock Not Found"
 
 def prueba(id):
     product_schema = ProductSchema()
@@ -125,4 +138,4 @@ def prueba(id):
     if p:
         return p
     else:
-        return "No hay nada"
+        return "Producto no existe"
