@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create category</title>
+</head>
+<body>
+<form method="POST" action="/products/create-product-form">
+    {{ form.csrf_token }}
+    <div>
+        {{ form.name.label }} {{ form.name(size=20) }}
+    </div>
+    <div>
+        {{ form.image.label }} {{ form.image(size=20) }}
+    </div>
+    <div>
+        {{ form.price.label }} {{ form.price(size=20) }}
+    </div>
+    <div>
+        {{ form.weight.label }} {{ form.weight(size=20) }}
+    </div>
+    <div>
+        {{ form.description.label }} {{ form.description(size=20) }}
+    </div>
+    <div>
+        {{ form.refundable.label }} {{ form.refundable(size=20) }}
+    </div>
+    <div>
+        {{ form.category_id.label }} {{ form.category_id(size=20) }}
+    </div>
+    <div>
+        <input type="submit" value="Go">
+    </div>
+</form>
+</body>
+</html>

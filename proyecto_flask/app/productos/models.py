@@ -72,8 +72,9 @@ def create_new_category(name):
     return None
 
 
-def create_new_product(name,price,refundable):
-    new_product = Product(name=name,price=price,refundable=refundable)
+def create_new_product(name,image,price,weight,description,refundable,category_id):
+    new_product = Product(name=name,image=image,weight=weight,price=price,description=description, \
+        refundable=refundable, category_id=category_id)
     db.session.add(new_product)
 
     if db.session.commit():
